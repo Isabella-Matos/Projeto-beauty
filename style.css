@@ -21,6 +21,7 @@
   --color-gold: #a45e68;
   --color-gold-light: #c88193;
   --color-about-glow: rgba(255, 183, 197, 0.22);
+  --color-about-band: rgba(164, 94, 104, 0.16);
   --color-about-bg: #efa0b1;
   --color-experience: #874b55;
   --color-experience-highlight: #f4c1ce;
@@ -59,6 +60,7 @@ body[data-theme="dark"] {
   --color-gold: #efa0b1;
   --color-gold-light: #cf7d94;
   --color-about-glow: rgba(74, 46, 61, 0.28);
+  --color-about-band: rgba(120, 56, 78, 0.2);
   --color-about-bg: #241d24;
   --color-experience: #673347;
   --color-experience-highlight: #f1b1c2;
@@ -249,7 +251,7 @@ button:focus-visible {
   padding: clamp(54px, 7vw, 88px) 0;
   background:
     radial-gradient(ellipse at 87% 14%, var(--color-about-glow) 0%, transparent 78%),
-    var(--color-cream);
+    transparent;
 }
 
 .hero-copy {
@@ -1058,7 +1060,7 @@ h2 em {
     padding: 45px 0 50px;
     background:
       radial-gradient(ellipse at 95% 55%, var(--color-about-glow) 0%, transparent 78%),
-      var(--color-cream);
+      transparent;
   }
 
   .hero-copy {
@@ -1321,12 +1323,32 @@ body[data-theme] #depoimentos {
 
 /* Sobre reúne o banner e a apresentação em uma página única. */
 .page-panel[data-page="sobre"] {
+  isolation: isolate;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  background: var(--color-about-bg);
+}
+
+.page-panel[data-page="sobre"]::before {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background: linear-gradient(
+    110deg,
+    transparent 0%,
+    transparent 38%,
+    var(--color-about-band) 47%,
+    var(--color-about-band) 53%,
+    transparent 62%,
+    transparent 100%
+  );
+  content: "";
+  pointer-events: none;
 }
 
 .page-panel[data-page="sobre"] > .hero,
 .page-panel[data-page="sobre"] > .about {
+  z-index: 1;
   display: flex;
   min-width: 0;
   min-height: 0;
@@ -1335,6 +1357,7 @@ body[data-theme] #depoimentos {
   justify-content: center;
   overflow: hidden;
   padding: clamp(22px, 4vw, 58px);
+  background: transparent;
 }
 
 .page-panel[data-page="sobre"] .hero-grid,
