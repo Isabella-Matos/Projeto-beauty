@@ -1,0 +1,115 @@
+// Regras locais para conteúdo público; mescle estes blocos às regras existentes antes de publicar.
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Permissões coincidentes são somadas; confira concessões amplas em todas as coleções.
+    // Clientes leem os serviços; cuidados compartilhados não são gravados em cada procedimento.
+    match /servicos/{serviceId} {
+      allow read: if true;
+      allow create, update: if request.auth != null
+        && request.auth.uid == "lTpeBYIEhFaAYDWKnyN6scmh9c33"
+        && request.resource.data.keys().hasAll([
+          "procedimento",
+          "categoria",
+          "preco"
+        ])
+        && request.resource.data.keys().hasOnly([
+          "procedimento",
+          "categoria",
+          "preco"
+        ])
+        && request.resource.data.procedimento is string
+        && request.resource.data.procedimento.size() >= 2
+        && request.resource.data.procedimento.size() <= 100
+        && request.resource.data.categoria is string
+        && request.resource.data.categoria in ["cera", "sobrancelhas"]
+        && request.resource.data.preco is number
+        && request.resource.data.preco >= 0
+        && request.resource.data.preco <= 1000000;
+
+      // Exclusões também são permitidas somente à conta autorizada.
+      allow delete: if request.auth != null
+        && request.auth.uid == "lTpeBYIEhFaAYDWKnyN6scmh9c33";
+    }
+
+    // Orientações são públicas para leitura e cada categoria só pode ser alterada pela Valeria.
+    match /orientacoes/{categoriaId} {
+      allow read: if true;
+      allow create, update: if request.auth != null
+        && request.auth.uid == "lTpeBYIEhFaAYDWKnyN6scmh9c33"
+        && categoriaId in ["cera", "sobrancelhas"]
+        && request.resource.data.keys().hasAll(["antes", "depois"])
+        && request.resource.data.keys().hasOnly(["antes", "depois"])
+        && request.resource.data.antes is string
+        && request.resource.data.antes.size() <= 5000
+        && request.resource.data.depois is string
+        && request.resource.data.depois.size() <= 5000;
+    }
+
+    // Clientes podem ler depoimentos; somente a conta da Valeria pode alterá-los.
+    match /comentarios/{commentId} {
+      allow read: if true;
+      allow create, update: if request.auth != null
+        && request.auth.uid == "lTpeBYIEhFaAYDWKnyN6scmh9c33"
+        && request.resource.data.keys().hasAll([
+          "nome",
+          "texto",
+          "avaliacao"
+        ])
+        && request.resource.data.nome is string
+        && request.resource.data.nome.size() >= 2
+        && request.resource.data.nome.size() <= 80
+        && request.resource.data.texto is string
+        && request.resource.data.texto.size() >= 2
+        && request.resource.data.texto.size() <= 1000
+        && request.resource.data.avaliacao is int
+        && request.resource.data.avaliacao >= 1
+        && request.resource.data.avaliacao <= 5;
+
+      // Exclusões também são permitidas somente à conta autorizada.
+      allow delete: if request.auth != null
+        && request.auth.uid == "lTpeBYIEhFaAYDWKnyN6scmh9c33";
+    }
+
+    // Clientes podem visualizar imagens locais; gravações ficam restritas à Valeria.
+    match /galeria/{imageId} {
+      allow read: if true;
+      allow create, update, delete: if request.auth != null
+        && request.auth.uid == "lTpeBYIEhFaAYDWKnyN6scmh9c33";
+    }
+
+    // Informações públicas são legíveis por todos e graváveis apenas pela conta da Valeria.
+    match /informacoes/estabelecimento {
+      allow read: if true;
+      allow create, update: if request.auth != null
+        && request.auth.uid == "lTpeBYIEhFaAYDWKnyN6scmh9c33"
+        && request.resource.data.keys().hasAll([
+          "nome",
+          "whatsapp",
+          "instagram",
+          "endereco"
+        ])
+        && request.resource.data.keys().hasOnly([
+          "nome",
+          "whatsapp",
+          "instagram",
+          "endereco"
+        ])
+        && request.resource.data.nome is string
+        && request.resource.data.nome.size() >= 2
+        && request.resource.data.nome.size() <= 100
+        && request.resource.data.whatsapp is string
+        && request.resource.data.whatsapp.matches("^[0-9+() -]{10,25}$")
+        && request.resource.data.instagram is string
+        && request.resource.data.instagram.size() <= 500
+        && request.resource.data.instagram.matches("^https://(www\\.)?instagram\\.com/.*$")
+        && request.resource.data.endereco is string
+        && request.resource.data.endereco.size() >= 5
+        && request.resource.data.endereco.size() <= 300;
+
+      // A exclusão do documento de contato também fica restrita à conta autorizada.
+      allow delete: if request.auth != null
+        && request.auth.uid == "lTpeBYIEhFaAYDWKnyN6scmh9c33";
+    }
+  }
+}

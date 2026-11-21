@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <!-- Define a codificação para aceitar acentos e caracteres especiais -->
+  <meta charset="UTF-8">
+
+  <!-- Faz a página se adaptar a celulares, tablets e computadores -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Nome que aparece na aba do navegador -->
+  <title>Área Administrativa | Valeria Santos Beauty</title>
+
+  <!-- Conecta o arquivo CSS responsável pelo visual desta página -->
+  <link rel="stylesheet" href="admin.css">
+</head>
+
+<body>
+
+  <!-- Área principal que envolve as telas de login e administração -->
+  <main class="admin-container">
+
+    <!-- Cartão que mantém o formulário de login existente -->
+    <section class="login-card" id="login-view">
+
+      <!-- Nome do estabelecimento -->
+      <h1>Valeria Santos Beauty</h1>
+
+      <!-- Identifica a página como área exclusiva da proprietária -->
+      <p class="subtitle">Área exclusiva da proprietária</p>
+
+      <!-- Título de boas-vindas -->
+      <h2>Bem-vinda!</h2>
+
+      <!-- Explica como acessar a área administrativa -->
+      <p>Entre com seu e-mail e sua senha para administrar o site.</p>
+
+      <!-- Formulário utilizado para realizar o login -->
+      <form id="login-form">
+
+        <!-- Campo para identificar o e-mail -->
+        <label for="email">E-mail</label>
+
+        <!-- Entrada do e-mail da proprietária -->
+        <input
+          type="email"
+          id="email"
+          placeholder="Digite seu e-mail"
+          required
+        >
+
+        <!-- Campo para identificar a senha -->
+        <label for="password">Senha</label>
+
+        <!-- Entrada da senha, ocultando os caracteres digitados -->
+        <input
+          type="password"
+          id="password"
+          placeholder="Digite sua senha"
+          required
+        >
+
+        <!-- Botão que envia os dados para o sistema de login -->
+        <button type="submit" id="login-button">
+          Entrar
+        </button>
+
+        <!-- Espaço onde o JavaScript poderá mostrar mensagens de erro ou sucesso -->
+        <p id="login-message" role="alert"></p>
+
+      </form>
+
+      <!-- Link para retornar à página pública do estabelecimento -->
+      <a href="index.html" class="back-link">
+        Voltar para o site
+      </a>
+
+    </section>
+
+    <!-- Painel exibido somente após a autenticação da conta autorizada -->
+    <section class="dashboard" id="dashboard-view" aria-label="Painel administrativo" hidden>
+
+      <!-- Cabeçalho do painel com a identidade do negócio e a ação de saída -->
+      <header class="dashboard-header">
+        <div class="brand">
+          <!-- Identificação textual do estabelecimento -->
+          <p class="brand-name">Valeria Santos Beauty</p>
+          <p class="brand-caption">Painel administrativo</p>
+        </div>
+
+        <!-- Botão para encerrar a sessão autenticada -->
+        <button type="button" class="logout-button" id="logout-button">
+          Sair da conta
+        </button>
+      </header>
+
+      <!-- Mensagem acessível para falhas ao encerrar a sessão -->
+      <p class="dashboard-message" id="dashboard-message" role="alert" aria-live="assertive"></p>
+
+      <!-- Navegação lateral e conteúdo da seção selecionada -->
+      <div class="dashboard-layout">
+
+        <!-- Menu principal do painel -->
+        <nav class="dashboard-nav" aria-label="Seções administrativas">
+          <p class="nav-heading">Menu</p>
+
+          <!-- Cada botão seleciona a seção correspondente no conteúdo central -->
+          <button type="button" class="nav-button active" data-section="overview" aria-current="page">
+            <span class="menu-index" aria-hidden="true">01</span>
+            <span>Visão geral</span>
+          </button>
+          <button type="button" class="nav-button" data-section="services">
+            <span class="menu-index" aria-hidden="true">02</span>
+            <span>Serviços e preços</span>
+          </button>
+          <!-- Abre a edição das orientações compartilhadas pelas categorias. -->
+          <button type="button" class="nav-button" data-section="guidance">
+            <span class="menu-index" aria-hidden="true">03</span>
+            <span>Orientações</span>
+          </button>
+          <button type="button" class="nav-button" data-section="gallery">
+            <span class="menu-index" aria-hidden="true">04</span>
+            <span>Galeria</span>
+          </button>
+          <button type="button" class="nav-button" data-section="comments">
+            <span class="menu-index" aria-hidden="true">05</span>
+            <span>Comentários</span>
+          </button>
+          <button type="button" class="nav-button" data-section="information">
+            <span class="menu-index" aria-hidden="true">06</span>
+            <span>Informações</span>
+          </button>
+        </nav>
+
+        <!-- Área central que apresenta a seção ativa -->
+        <div class="dashboard-content" id="dashboard-content">
+
+          <!-- Apresentação inicial com mensagem de boas-vindas -->
+          <section class="content-panel" data-panel="overview">
+            <p class="eyebrow">Seu espaço de gestão</p>
+            <h1>Bem-vinda, Valeria!</h1>
+            <p class="panel-intro">
+              Este é o painel administrativo da Valeria Santos Beauty. Escolha uma seção no menu para visualizar sua área.
+            </p>
+            <div class="welcome-card">
+              <span class="welcome-mark" aria-hidden="true">VS</span>
+              <div>
+                <h2>Tudo em um só lugar</h2>
+                <p>As áreas de serviços, orientações, galeria, comentários e informações estão organizadas para facilitar sua gestão.</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Área administrativa de cadastro, edição e leitura dos serviços -->
+          <section class="content-panel" data-panel="services" hidden>
+            <p class="eyebrow">Catálogo</p>
+            <h1>Serviços e preços</h1>
+            <p class="panel-intro">Gerencie os serviços exibidos para os clientes no site.</p>
+
+            <!-- Formulário usado somente pela conta autenticada e autorizada -->
+            <section class="service-editor-card" aria-labelledby="service-form-title">
+              <div class="service-editor-heading">
+                <h2 id="service-form-title">Adicionar serviço</h2>
+                <p>Informe o procedimento, a categoria e o preço. As orientações são configuradas por categoria.</p>
+              </div>
+
+              <!-- O JavaScript valida os campos antes de permitir a gravação -->
+              <form id="service-form" class="service-form">
+                <div class="service-form-field">
+                  <label for="service-name">Nome do serviço</label>
+                  <input
+                    id="service-name"
+                    name="procedimento"
+                    type="text"
+                    minlength="2"
+                    maxlength="100"
+                    autocomplete="off"
+                    required
+                  >
+                </div>
+
+                <!-- Cada serviço pertence explicitamente a uma única categoria pública -->
+                <div class="service-form-field">
+                  <label for="service-category">Categoria</label>
+                  <select id="service-category" name="categoria" required>
+                    <option value="" selected disabled>Selecione uma categoria</option>
+                    <option value="cera">Cera</option>
+                    <option value="sobrancelhas">Sobrancelhas</option>
+                  </select>
+                </div>
+
+                <div class="service-form-field">
+                  <label for="service-price">Preço (R$)</label>
+                  <input
+                    id="service-price"
+                    name="preco"
+                    type="text"
+                    inputmode="decimal"
+                    maxlength="20"
+                    placeholder="Ex.: 45,00"
+                    required
+                  >
+                </div>
+
+                <!-- A ação muda de cadastro para edição conforme a seleção do cartão -->
+                <div class="service-form-actions">
+                  <button type="submit" class="service-save-button" id="service-save-button">
+                    Adicionar serviço
+                  </button>
+                  <button type="button" class="service-cancel-button" id="service-cancel-button" hidden>
+                    Cancelar edição
+                  </button>
+                </div>
+
+                <!-- Comunica o resultado das operações de gravação -->
+                <p class="service-form-message" id="service-form-message" role="status" aria-live="polite"></p>
+              </form>
+            </section>
+
+            <!-- Mensagens de carregamento, lista vazia ou erro da consulta -->
+            <p class="services-state" id="services-state" role="status" aria-live="polite" hidden></p>
+
+            <!-- Cartões dos serviços carregados do Firestore -->
+            <div class="services-list" id="services-list" aria-live="polite"></div>
+          </section>
+
+          <!-- Cada formulário mantém cuidados compartilhados por todos os serviços de sua categoria. -->
+          <section class="content-panel" data-panel="guidance" hidden>
+            <p class="eyebrow">Cuidados por categoria</p>
+            <h1>Orientações</h1>
+            <p class="panel-intro">
+              Cadastre uma única orientação antes e depois para cada categoria. Todos os procedimentos da categoria usam estes mesmos textos.
+            </p>
+
+            <!-- Os documentos cera e sobrancelhas são carregados e salvos separadamente no Firestore. -->
+            <div class="guidance-category-grid">
+              <section class="service-editor-card" aria-labelledby="wax-guidance-title">
+                <div class="service-editor-heading">
+                  <h2 id="wax-guidance-title">Cera</h2>
+                  <p>Orientações compartilhadas por todos os procedimentos com cera.</p>
+                </div>
+                <form id="wax-guidance-form" class="service-form" data-guidance-category="cera">
+                  <div class="service-form-field">
+                    <label for="wax-guidance-before">Cuidados e preparo antes dos procedimentos</label>
+                    <textarea id="wax-guidance-before" name="antes" rows="5" maxlength="5000" disabled></textarea>
+                  </div>
+                  <div class="service-form-field">
+                    <label for="wax-guidance-after">Cuidados e recomendações depois dos procedimentos</label>
+                    <textarea id="wax-guidance-after" name="depois" rows="5" maxlength="5000" disabled></textarea>
+                  </div>
+                  <div class="service-form-actions">
+                    <button type="submit" class="service-save-button" id="wax-guidance-save-button" disabled>
+                      Salvar orientações de Cera
+                    </button>
+                  </div>
+                  <p class="service-form-message" id="wax-guidance-message" role="status" aria-live="polite"></p>
+                </form>
+              </section>
+
+              <section class="service-editor-card" aria-labelledby="brow-guidance-title">
+                <div class="service-editor-heading">
+                  <h2 id="brow-guidance-title">Sobrancelhas</h2>
+                  <p>Orientações compartilhadas por todos os procedimentos de sobrancelhas.</p>
+                </div>
+                <form id="brow-guidance-form" class="service-form" data-guidance-category="sobrancelhas">
+                  <div class="service-form-field">
+                    <label for="brow-guidance-before">Cuidados e preparo antes dos procedimentos</label>
+                    <textarea id="brow-guidance-before" name="antes" rows="5" maxlength="5000" disabled></textarea>
+                  </div>
+                  <div class="service-form-field">
+                    <label for="brow-guidance-after">Cuidados e recomendações depois dos procedimentos</label>
+                    <textarea id="brow-guidance-after" name="depois" rows="5" maxlength="5000" disabled></textarea>
+                  </div>
+                  <div class="service-form-actions">
+                    <button type="submit" class="service-save-button" id="brow-guidance-save-button" disabled>
+                      Salvar orientações de Sobrancelhas
+                    </button>
+                  </div>
+                  <p class="service-form-message" id="brow-guidance-message" role="status" aria-live="polite"></p>
+                </form>
+              </section>
+            </div>
+          </section>
+
+          <!-- Gerencia caminhos de imagens locais e descrições dos registros da galeria. -->
+          <section class="content-panel" data-panel="gallery" hidden>
+            <p class="eyebrow">Portfólio</p>
+            <h1>Galeria</h1>
+            <p class="panel-intro">
+              Cadastre o caminho de uma imagem que já exista em imagens/ e sua descrição. Nenhum arquivo será enviado.
+            </p>
+
+            <!-- O formulário grava somente caminho e descrição na coleção galeria. -->
+            <section class="service-editor-card" aria-labelledby="gallery-form-title">
+              <div class="service-editor-heading">
+                <h2 id="gallery-form-title">Adicionar imagem</h2>
+                <p>Use um caminho como imagens/foto.png. Os arquivos devem estar diretamente na pasta imagens/.</p>
+              </div>
+              <form id="gallery-form" class="service-form">
+                <div class="service-form-field">
+                  <label for="gallery-path">Caminho do arquivo</label>
+                  <input
+                    id="gallery-path"
+                    name="caminho"
+                    type="text"
+                    maxlength="300"
+                    autocomplete="off"
+                    placeholder="imagens/foto.png"
+                    required
+                  >
+                </div>
+                <div class="service-form-field">
+                  <label for="gallery-description">Descrição da imagem</label>
+                  <textarea
+                    id="gallery-description"
+                    name="descricao"
+                    rows="3"
+                    minlength="2"
+                    maxlength="300"
+                    required
+                  ></textarea>
+                </div>
+
+                <!-- A prévia carrega apenas o arquivo local indicado no campo de caminho. -->
+                <div class="gallery-preview-card" aria-live="polite">
+                  <img
+                    class="gallery-admin-preview"
+                    id="gallery-preview-image"
+                    alt=""
+                    hidden
+                  >
+                  <p class="gallery-preview-state" id="gallery-preview-state">
+                    Informe um caminho válido para ver a prévia.
+                  </p>
+                </div>
+
+                <!-- As ações mudam entre cadastro e edição do registro selecionado. -->
+                <div class="service-form-actions">
+                  <button type="submit" class="service-save-button" id="gallery-save-button" disabled>
+                    Adicionar imagem
+                  </button>
+                  <button type="button" class="service-cancel-button" id="gallery-cancel-button" hidden>
+                    Cancelar edição
+                  </button>
+                </div>
+                <p class="service-form-message" id="gallery-form-message" role="status" aria-live="polite"></p>
+              </form>
+            </section>
+
+            <!-- Comunica o carregamento, a lista vazia ou falhas da coleção administrativa. -->
+            <p class="services-state" id="gallery-load-state" role="status" aria-live="polite" hidden></p>
+            <button type="button" class="service-cancel-button" id="gallery-retry-button" hidden>
+              Tentar carregar novamente
+            </button>
+
+            <!-- Lista os registros do Firestore e oferece ações somente à proprietária autenticada. -->
+            <div class="gallery-admin-list" id="gallery-list" aria-live="polite"></div>
+          </section>
+
+          <!-- Gerenciamento administrativo de depoimentos cadastrados no Firestore -->
+          <section class="content-panel" data-panel="comments" hidden>
+            <p class="eyebrow">Atendimento</p>
+            <h1>Comentários</h1>
+            <p class="panel-intro">Cadastre e gerencie depoimentos autorizados para exibição aos clientes.</p>
+
+            <!-- Formulário administrativo; não existe formulário público de envio -->
+            <section class="service-editor-card" aria-labelledby="comment-form-title">
+              <div class="service-editor-heading">
+                <h2 id="comment-form-title">Adicionar comentário</h2>
+                <p>Informe o nome, o depoimento e uma avaliação de 1 a 5 estrelas.</p>
+              </div>
+
+              <!-- O JavaScript valida os campos antes de permitir a gravação -->
+              <form id="comment-form" class="service-form">
+                <div class="service-form-field">
+                  <label for="comment-name">Nome da cliente</label>
+                  <input
+                    id="comment-name"
+                    name="nome"
+                    type="text"
+                    minlength="2"
+                    maxlength="80"
+                    autocomplete="off"
+                    required
+                  >
+                </div>
+
+                <div class="service-form-field">
+                  <label for="comment-text">Comentário</label>
+                  <textarea
+                    id="comment-text"
+                    name="texto"
+                    rows="4"
+                    minlength="2"
+                    maxlength="1000"
+                    required
+                  ></textarea>
+                </div>
+
+                <div class="service-form-field">
+                  <label for="comment-rating">Avaliação</label>
+                  <select id="comment-rating" name="avaliacao" required>
+                    <option value="" selected disabled>Selecione de 1 a 5 estrelas</option>
+                    <option value="1">1 estrela</option>
+                    <option value="2">2 estrelas</option>
+                    <option value="3">3 estrelas</option>
+                    <option value="4">4 estrelas</option>
+                    <option value="5">5 estrelas</option>
+                  </select>
+                </div>
+
+                <!-- A ação muda de cadastro para edição conforme a seleção do cartão -->
+                <div class="service-form-actions">
+                  <button type="submit" class="service-save-button" id="comment-save-button">
+                    Adicionar comentário
+                  </button>
+                  <button type="button" class="service-cancel-button" id="comment-cancel-button" hidden>
+                    Cancelar edição
+                  </button>
+                </div>
+
+                <!-- Comunica o resultado das operações de gravação -->
+                <p class="service-form-message" id="comment-form-message" role="status" aria-live="polite"></p>
+              </form>
+            </section>
+
+            <!-- Mensagens de carregamento, lista vazia ou erro de leitura -->
+            <p class="services-state" id="comments-state" role="status" aria-live="polite" hidden></p>
+
+            <!-- Depoimentos e ações administrativas da conta autorizada -->
+            <div class="services-list comments-list" id="comments-list" aria-live="polite"></div>
+          </section>
+
+          <!-- Formulário administrativo para criar ou atualizar o documento do estabelecimento -->
+          <section class="content-panel" data-panel="information" hidden>
+            <p class="eyebrow">Perfil do negócio</p>
+            <h1>Informações</h1>
+            <p class="panel-intro">Visualize e atualize os dados exibidos na seção pública de contato do site.</p>
+
+            <!-- O formulário só é carregado e gravado após validar a conta autorizada -->
+            <section class="service-editor-card" aria-labelledby="information-form-title">
+              <div class="service-editor-heading">
+                <h2 id="information-form-title">Dados do estabelecimento</h2>
+                <p>Esses dados são salvos no documento informacoes/estabelecimento.</p>
+              </div>
+
+              <!-- Os campos são validados antes de criar ou atualizar o documento -->
+              <form id="information-form" class="service-form">
+                <div class="service-form-field">
+                  <label for="information-name">Nome do estabelecimento</label>
+                  <input
+                    id="information-name"
+                    name="nome"
+                    type="text"
+                    minlength="2"
+                    maxlength="100"
+                    autocomplete="organization"
+                    required
+                  >
+                </div>
+
+                <div class="service-form-field">
+                  <label for="information-whatsapp">WhatsApp com código do país</label>
+                  <input
+                    id="information-whatsapp"
+                    name="whatsapp"
+                    type="tel"
+                    maxlength="25"
+                    autocomplete="tel"
+                    placeholder="+55 31 97232-1537"
+                    required
+                  >
+                </div>
+
+                <div class="service-form-field">
+                  <label for="information-instagram">Instagram (URL completa)</label>
+                  <input
+                    id="information-instagram"
+                    name="instagram"
+                    type="url"
+                    maxlength="500"
+                    inputmode="url"
+                    placeholder="https://www.instagram.com/seu-perfil/"
+                    required
+                  >
+                </div>
+
+                <div class="service-form-field">
+                  <label for="information-address">Endereço</label>
+                  <textarea
+                    id="information-address"
+                    name="endereco"
+                    rows="3"
+                    minlength="5"
+                    maxlength="300"
+                    required
+                  ></textarea>
+                </div>
+
+                <!-- Informa o resultado e diferencia o cadastro inicial da edição -->
+                <div class="service-form-actions">
+                  <!-- Só libera a gravação após a leitura confirmar acesso e estado do documento -->
+                  <button type="submit" class="service-save-button" id="information-save-button" disabled>
+                    Salvar informações
+                  </button>
+                </div>
+
+                <!-- Comunica o resultado das operações de gravação -->
+                <p class="service-form-message" id="information-form-message" role="status" aria-live="polite"></p>
+              </form>
+            </section>
+
+            <!-- Informa carregamento, ausência do documento e erros de leitura -->
+            <p class="services-state" id="information-state" role="status" aria-live="polite" hidden></p>
+
+            <!-- Permite repetir uma leitura após uma falha de conexão ou permissão -->
+            <button type="button" class="service-cancel-button" id="information-retry-button" hidden>
+              Tentar carregar novamente
+            </button>
+          </section>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Carrega o JavaScript responsável pela autenticação e funcionamento da página -->
+  <script type="module" src="admin.js"></script>
+
+</body>
+</html>
+
