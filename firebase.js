@@ -3,7 +3,7 @@
   ARQUIVO: firebase.js
 
   OBJETIVO:
-  Conectar o site Valeria Santos Beauty
+  Conectar o site Valéria Santos Beauty
   aos serviços do Firebase.
 */
 

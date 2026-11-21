@@ -590,6 +590,45 @@ body {
   margin-top: 30px;
 }
 
+/* Mantém os controles de paginação discretos e alinhados ao visual do painel. */
+.admin-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 22px;
+}
+
+.admin-pagination-status {
+  min-width: 105px;
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+.admin-pagination-button {
+  min-height: 38px;
+  padding: 8px 13px;
+  border: 1px solid #e2b6ca;
+  border-radius: 9px;
+  background: #fff;
+  color: var(--pink-dark);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-pagination-button:hover:not(:disabled) {
+  border-color: var(--pink);
+  background: #fff8fb;
+}
+
+.admin-pagination-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
 /* Apresenta cada serviço e as ações autorizadas em um cartão. */
 .service-admin-card {
   min-width: 0;

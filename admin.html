@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Nome que aparece na aba do navegador -->
-  <title>Área Administrativa | Valeria Santos Beauty</title>
+  <title>Área Administrativa | Valéria Santos Beauty</title>
 
   <!-- Conecta o arquivo CSS responsável pelo visual desta página -->
   <link rel="stylesheet" href="admin.css">
@@ -23,7 +23,7 @@
     <section class="login-card" id="login-view">
 
       <!-- Nome do estabelecimento -->
-      <h1>Valeria Santos Beauty</h1>
+      <h1>Valéria Santos Beauty</h1>
 
       <!-- Identifica a página como área exclusiva da proprietária -->
       <p class="subtitle">Área exclusiva da proprietária</p>
@@ -83,7 +83,7 @@
       <header class="dashboard-header">
         <div class="brand">
           <!-- Identificação textual do estabelecimento -->
-          <p class="brand-name">Valeria Santos Beauty</p>
+          <p class="brand-name">Valéria Santos Beauty</p>
           <p class="brand-caption">Painel administrativo</p>
         </div>
 
@@ -137,9 +137,9 @@
           <!-- Apresentação inicial com mensagem de boas-vindas -->
           <section class="content-panel" data-panel="overview">
             <p class="eyebrow">Seu espaço de gestão</p>
-            <h1>Bem-vinda, Valeria!</h1>
+            <h1>Bem-vinda, Valéria!</h1>
             <p class="panel-intro">
-              Este é o painel administrativo da Valeria Santos Beauty. Escolha uma seção no menu para visualizar sua área.
+              Este é o painel administrativo da Valéria Santos Beauty. Escolha uma seção no menu para visualizar sua área.
             </p>
             <div class="welcome-card">
               <span class="welcome-mark" aria-hidden="true">VS</span>
@@ -183,7 +183,7 @@
                   <label for="service-category">Categoria</label>
                   <select id="service-category" name="categoria" required>
                     <option value="" selected disabled>Selecione uma categoria</option>
-                    <option value="cera">Cera</option>
+                    <option value="cera">Epilação</option>
                     <option value="sobrancelhas">Sobrancelhas</option>
                   </select>
                 </div>
@@ -221,6 +221,12 @@
 
             <!-- Cartões dos serviços carregados do Firestore -->
             <div class="services-list" id="services-list" aria-live="polite"></div>
+            <!-- Paginação independente da lista de serviços. -->
+            <nav class="admin-pagination" aria-label="Paginação dos serviços">
+              <button type="button" class="admin-pagination-button" id="services-page-prev">Anterior</button>
+              <p class="admin-pagination-status" id="services-page-status" aria-live="polite">Página 1 de 1</p>
+              <button type="button" class="admin-pagination-button" id="services-page-next">Próxima</button>
+            </nav>
           </section>
 
           <!-- Cada formulário mantém cuidados compartilhados por todos os serviços de sua categoria. -->
@@ -231,12 +237,12 @@
               Cadastre uma única orientação antes e depois para cada categoria. Todos os procedimentos da categoria usam estes mesmos textos.
             </p>
 
-            <!-- Os documentos cera e sobrancelhas são carregados e salvos separadamente no Firestore. -->
+            <!-- Os documentos internos de cera e sobrancelhas continuam separados no Firestore. -->
             <div class="guidance-category-grid">
               <section class="service-editor-card" aria-labelledby="wax-guidance-title">
                 <div class="service-editor-heading">
-                  <h2 id="wax-guidance-title">Cera</h2>
-                  <p>Orientações compartilhadas por todos os procedimentos com cera.</p>
+                  <h2 id="wax-guidance-title">Epilação</h2>
+                  <p>Orientações compartilhadas por todos os procedimentos de epilação.</p>
                 </div>
                 <form id="wax-guidance-form" class="service-form" data-guidance-category="cera">
                   <div class="service-form-field">
@@ -249,7 +255,7 @@
                   </div>
                   <div class="service-form-actions">
                     <button type="submit" class="service-save-button" id="wax-guidance-save-button" disabled>
-                      Salvar orientações de Cera
+                      Salvar orientações de epilação
                     </button>
                   </div>
                   <p class="service-form-message" id="wax-guidance-message" role="status" aria-live="polite"></p>
@@ -354,6 +360,12 @@
 
             <!-- Lista os registros do Firestore e oferece ações somente à proprietária autenticada. -->
             <div class="gallery-admin-list" id="gallery-list" aria-live="polite"></div>
+            <!-- Paginação independente da lista da galeria. -->
+            <nav class="admin-pagination" aria-label="Paginação da galeria">
+              <button type="button" class="admin-pagination-button" id="gallery-page-prev">Anterior</button>
+              <p class="admin-pagination-status" id="gallery-page-status" aria-live="polite">Página 1 de 1</p>
+              <button type="button" class="admin-pagination-button" id="gallery-page-next">Próxima</button>
+            </nav>
           </section>
 
           <!-- Gerenciamento administrativo de depoimentos cadastrados no Firestore -->
@@ -428,6 +440,12 @@
 
             <!-- Depoimentos e ações administrativas da conta autorizada -->
             <div class="services-list comments-list" id="comments-list" aria-live="polite"></div>
+            <!-- Paginação independente da lista de comentários. -->
+            <nav class="admin-pagination" aria-label="Paginação dos comentários">
+              <button type="button" class="admin-pagination-button" id="comments-page-prev">Anterior</button>
+              <p class="admin-pagination-status" id="comments-page-status" aria-live="polite">Página 1 de 1</p>
+              <button type="button" class="admin-pagination-button" id="comments-page-next">Próxima</button>
+            </nav>
           </section>
 
           <!-- Formulário administrativo para criar ou atualizar o documento do estabelecimento -->

@@ -18,17 +18,17 @@ console.log("Autenticação:", auth);
 
 // Mantém dados atuais como conteúdo inicial enquanto o Firestore carrega o registro oficial.
 const CONTATOS = {
-  nome: "Valeria Santos Beauty",
+  nome: "Valéria Santos Beauty",
   whatsapp: "5531972321537",
   instagram: "https://www.instagram.com/valeriasantos.beauty/",
   endereco: "Avenida Doutor Rossini de Minas, 222, São Joaquim de Bicas - MG"
 };
 const WHATSAPP_MESSAGE =
-  "Olá, Valeria! Conheci seu site e gostaria de agendar um horário. Poderia me passar mais informações?";
+  "Olá, Valéria! Conheci seu site e gostaria de agendar um horário. Poderia me passar mais informações?";
 
 // Mantém a mensagem de contato sem guardar orientações individuais nos serviços.
 const CONFIG_SERVICOS = {
-  mensagemWhatsapp: "Olá, Valeria! Gostaria de consultar os serviços e valores."
+  mensagemWhatsapp: "Olá, Valéria! Gostaria de consultar os serviços e valores."
 };
 
 const pagePanels = Array.from(document.querySelectorAll(".page-panel"));
@@ -165,7 +165,7 @@ function renderServicesDialog(categoriaSelecionada) {
   }
   activeServiceCategory = categoriaSelecionada;
 
-  // Mostra um único texto compartilhado e informa quando a Valeria ainda não o cadastrou.
+  // Mostra um único texto compartilhado e informa quando a Valéria ainda não o cadastrou.
   const fillGuidanceList = (list, texto, mensagemVazia) => {
     const item = document.createElement("li");
     item.textContent =
@@ -180,7 +180,7 @@ function renderServicesDialog(categoriaSelecionada) {
 
   // Identifica a categoria ativa no título do quadro para não misturar os serviços.
   const nomeCategoria =
-    categoriaSelecionada === "cera" ? "Cera" : "Sobrancelhas";
+    categoriaSelecionada === "cera" ? "Epilação" : "Sobrancelhas";
   servicesDialogTitle.textContent = `Serviços de ${nomeCategoria}`;
 
   // Informa ao cliente que a tabela está aguardando os dados públicos do Firestore.
@@ -468,7 +468,8 @@ function normalizePublicInformation(data) {
   }
 
   return {
-    nome,
+    // Corrige apenas a apresentação do nome recebido pelo Firestore, sem alterar o campo interno.
+    nome: nome.replace(/\bValeria\b/g, "Valéria"),
     whatsapp,
     instagram: instagram.href,
     endereco

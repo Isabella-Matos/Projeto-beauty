@@ -49,6 +49,9 @@ const mensagemPainel = document.getElementById("dashboard-message");
 // Localiza as áreas de estado e conteúdo da lista de serviços.
 const estadoServicos = document.getElementById("services-state");
 const listaServicos = document.getElementById("services-list");
+const botaoAnteriorServicos = document.getElementById("services-page-prev");
+const botaoProximaServicos = document.getElementById("services-page-next");
+const statusPaginacaoServicos = document.getElementById("services-page-status");
 const formularioServico = document.getElementById("service-form");
 const campoNomeServico = document.getElementById("service-name");
 const campoCategoriaServico = document.getElementById("service-category");
@@ -62,6 +65,9 @@ const mensagemFormularioServico = document.getElementById("service-form-message"
 const estadoGaleria = document.getElementById("gallery-load-state");
 const botaoTentarCarregarGaleria = document.getElementById("gallery-retry-button");
 const listaGaleria = document.getElementById("gallery-list");
+const botaoAnteriorGaleria = document.getElementById("gallery-page-prev");
+const botaoProximaGaleria = document.getElementById("gallery-page-next");
+const statusPaginacaoGaleria = document.getElementById("gallery-page-status");
 const formularioGaleria = document.getElementById("gallery-form");
 const campoCaminhoGaleria = document.getElementById("gallery-path");
 const campoDescricaoGaleria = document.getElementById("gallery-description");
@@ -99,6 +105,9 @@ const formulariosOrientacoes = {
 // Localiza o formulário e as mensagens da área administrativa de comentários.
 const estadoComentarios = document.getElementById("comments-state");
 const listaComentarios = document.getElementById("comments-list");
+const botaoAnteriorComentarios = document.getElementById("comments-page-prev");
+const botaoProximaComentarios = document.getElementById("comments-page-next");
+const statusPaginacaoComentarios = document.getElementById("comments-page-status");
 const formularioComentario = document.getElementById("comment-form");
 const campoNomeComentario = document.getElementById("comment-name");
 const campoTextoComentario = document.getElementById("comment-text");
@@ -146,10 +155,118 @@ let informacoesCarregadas = false;
 let documentoInformacoesExiste = false;
 let operacaoInformacoesEmAndamento = false;
 
+// Mantém a página e os documentos carregados independentemente em cada histórico.
+const paginacoesAdministrativas = {
+  servicos: {
+    pagina: 1,
+    itensPorPagina: 2,
+    documentos: [],
+    lista: listaServicos,
+    botaoAnterior: botaoAnteriorServicos,
+    botaoProxima: botaoProximaServicos,
+    status: statusPaginacaoServicos
+  },
+  galeria: {
+    pagina: 1,
+    itensPorPagina: 3,
+    documentos: [],
+    lista: listaGaleria,
+    botaoAnterior: botaoAnteriorGaleria,
+    botaoProxima: botaoProximaGaleria,
+    status: statusPaginacaoGaleria
+  },
+  comentarios: {
+    pagina: 1,
+    itensPorPagina: 2,
+    documentos: [],
+    lista: listaComentarios,
+    botaoAnterior: botaoAnteriorComentarios,
+    botaoProxima: botaoProximaComentarios,
+    status: statusPaginacaoComentarios
+  }
+};
+
 // Confere a conta atual antes de qualquer consulta ou gravação administrativa.
 function proprietariaAutorizada() {
   return Boolean(auth.currentUser && auth.currentUser.uid === UID_VALERIA);
 }
+
+// Renderiza uma página sem alterar os dados nem as coleções do Firebase.
+function renderizarPaginacao(chave, criarCartao) {
+  const configuracao = paginacoesAdministrativas[chave];
+  const totalPaginas = Math.max(
+    1,
+    Math.ceil(configuracao.documentos.length / configuracao.itensPorPagina)
+  );
+
+  configuracao.pagina = Math.min(Math.max(1, configuracao.pagina), totalPaginas);
+  const inicio = (configuracao.pagina - 1) * configuracao.itensPorPagina;
+  const documentosPagina = configuracao.documentos.slice(
+    inicio,
+    inicio + configuracao.itensPorPagina
+  );
+
+  configuracao.lista.replaceChildren(...documentosPagina.map(criarCartao));
+  configuracao.status.textContent =
+    `Página ${configuracao.pagina} de ${totalPaginas}`;
+  configuracao.botaoAnterior.disabled = configuracao.pagina <= 1;
+  configuracao.botaoProxima.disabled = configuracao.pagina >= totalPaginas;
+}
+
+// Os eventos usam configurações próprias para que cada aba mantenha sua página atual.
+botaoAnteriorServicos.addEventListener("click", () => {
+  const configuracao = paginacoesAdministrativas.servicos;
+  // Impede valores menores que 1 e limita a mudança à página atual existente.
+  if (configuracao.pagina > 1) {
+    configuracao.pagina -= 1;
+    renderizarPaginacao("servicos", criarCartaoServico);
+  }
+});
+
+botaoProximaServicos.addEventListener("click", () => {
+  const configuracao = paginacoesAdministrativas.servicos;
+  const totalPaginas = Math.max(
+    1,
+    Math.ceil(configuracao.documentos.length / configuracao.itensPorPagina)
+  );
+  // Avança somente enquanto existir uma próxima página real.
+  if (configuracao.pagina < totalPaginas) {
+    configuracao.pagina += 1;
+    renderizarPaginacao("servicos", criarCartaoServico);
+  }
+});
+
+botaoAnteriorGaleria.addEventListener("click", () => {
+  paginacoesAdministrativas.galeria.pagina -= 1;
+  renderizarPaginacao("galeria", criarCartaoGaleria);
+});
+
+botaoProximaGaleria.addEventListener("click", () => {
+  paginacoesAdministrativas.galeria.pagina += 1;
+  renderizarPaginacao("galeria", criarCartaoGaleria);
+});
+
+botaoAnteriorComentarios.addEventListener("click", () => {
+  const configuracao = paginacoesAdministrativas.comentarios;
+  // Mantém o histórico de comentários na primeira página como limite mínimo.
+  if (configuracao.pagina > 1) {
+    configuracao.pagina -= 1;
+    renderizarPaginacao("comentarios", criarCartaoComentario);
+  }
+});
+
+botaoProximaComentarios.addEventListener("click", () => {
+  const configuracao = paginacoesAdministrativas.comentarios;
+  const totalPaginas = Math.max(
+    1,
+    Math.ceil(configuracao.documentos.length / configuracao.itensPorPagina)
+  );
+  // Avança somente enquanto houver registros suficientes para a próxima página.
+  if (configuracao.pagina < totalPaginas) {
+    configuracao.pagina += 1;
+    renderizarPaginacao("comentarios", criarCartaoComentario);
+  }
+});
 
 // Exibe a tela de login e oculta o painel.
 function mostrarLogin() {
@@ -419,7 +536,7 @@ async function salvarOrientacoesCategoria(evento) {
     configuracao.operacaoEmAndamento = false;
     configuracao.botaoSalvar.textContent =
       categoria === "cera"
-        ? "Salvar orientações de Cera"
+        ? "Salvar orientações de epilação"
         : "Salvar orientações de Sobrancelhas";
     atualizarControlesOrientacoes(configuracao);
   }
@@ -678,6 +795,7 @@ async function carregarGaleria(forcarAtualizacao = false) {
   }
 
   if (galeriaCarregada && !forcarAtualizacao) {
+    renderizarPaginacao("galeria", criarCartaoGaleria);
     return true;
   }
 
@@ -698,7 +816,6 @@ async function carregarGaleria(forcarAtualizacao = false) {
         return false;
       }
 
-      const cartoes = resultado.docs.map(criarCartaoGaleria);
       const registrosInvalidos = resultado.docs.filter((documento) => {
         const imagem = documento.data();
         return !getLocalGalleryPath(imagem.caminho) ||
@@ -706,7 +823,8 @@ async function carregarGaleria(forcarAtualizacao = false) {
           !imagem.descricao.trim();
       }).length;
 
-      listaGaleria.replaceChildren(...cartoes);
+      paginacoesAdministrativas.galeria.documentos = resultado.docs;
+      renderizarPaginacao("galeria", criarCartaoGaleria);
       galeriaCarregada = true;
 
       if (resultado.empty) {
@@ -826,6 +944,9 @@ async function salvarImagemGaleria(evento) {
 
     galeriaCarregada = false;
     limparFormularioGaleria();
+    if (!estavaEditando) {
+      paginacoesAdministrativas.galeria.pagina = 1;
+    }
     const listaAtualizada = await carregarGaleria(true);
     atualizarMensagemFormularioGaleria(
       listaAtualizada
@@ -895,7 +1016,7 @@ async function excluirImagemGaleria(id, descricao) {
 // Converte somente os dois valores permitidos em rótulos visíveis no painel.
 function rotuloCategoriaServico(categoria) {
   if (categoria === "cera") {
-    return "Cera";
+    return "Epilação";
   }
 
   if (categoria === "sobrancelhas") {
@@ -999,7 +1120,7 @@ function validarServico() {
   );
   campoCategoriaServico.setCustomValidity(
     categoria !== "cera" && categoria !== "sobrancelhas"
-      ? "Selecione Cera ou Sobrancelhas."
+      ? "Selecione Epilação ou Sobrancelhas."
       : ""
   );
   campoPrecoServico.setCustomValidity(
@@ -1026,6 +1147,7 @@ async function carregarServicos(forcarAtualizacao = false) {
 
   // Reutiliza uma lista recente e evita chamadas simultâneas à coleção.
   if (servicosCarregados && !forcarAtualizacao) {
+    renderizarPaginacao("servicos", criarCartaoServico);
     return true;
   }
 
@@ -1044,20 +1166,20 @@ async function carregarServicos(forcarAtualizacao = false) {
   requisicaoServicos = (async () => {
     try {
       const resultado = await getDocs(collection(db, "servicos"));
-      const cartoes = resultado.docs.map(criarCartaoServico);
       const servicosSemCategoria = resultado.docs.filter((documento) => {
         const servico = documento.data();
         return servico.categoria !== "cera" && servico.categoria !== "sobrancelhas";
       }).length;
-      listaServicos.replaceChildren(...cartoes);
+      paginacoesAdministrativas.servicos.documentos = resultado.docs;
+      renderizarPaginacao("servicos", criarCartaoServico);
       servicosCarregados = true;
 
-      // Mantém registros antigos sem categoria pendentes de escolha manual pela Valeria.
+      // Mantém registros antigos sem categoria pendentes de escolha manual pela Valéria.
       if (resultado.empty) {
         atualizarEstadoServicos("Nenhum serviço cadastrado.");
       } else if (servicosSemCategoria > 0) {
         atualizarEstadoServicos(
-          `${servicosSemCategoria} serviço(s) sem categoria precisam ser revisados. Edite cada cadastro e escolha Cera ou Sobrancelhas; eles não serão classificados automaticamente.`
+          `${servicosSemCategoria} serviço(s) sem categoria precisam ser revisados. Edite cada cadastro e escolha Epilação ou Sobrancelhas; eles não serão classificados automaticamente.`
         );
       } else {
         atualizarEstadoServicos("");
@@ -1410,6 +1532,7 @@ async function carregarComentarios(forcarAtualizacao = false) {
 
   // Reutiliza a lista existente e evita chamadas simultâneas à coleção.
   if (comentariosCarregados && !forcarAtualizacao) {
+    renderizarPaginacao("comentarios", criarCartaoComentario);
     return true;
   }
 
@@ -1428,9 +1551,8 @@ async function carregarComentarios(forcarAtualizacao = false) {
   requisicaoComentarios = (async () => {
     try {
       const resultado = await getDocs(collection(db, "comentarios"));
-      listaComentarios.replaceChildren(
-        ...resultado.docs.map(criarCartaoComentario)
-      );
+      paginacoesAdministrativas.comentarios.documentos = resultado.docs;
+      renderizarPaginacao("comentarios", criarCartaoComentario);
       comentariosCarregados = true;
       atualizarEstadoComentarios(
         resultado.empty ? "Nenhum comentário cadastrado." : ""
@@ -1709,6 +1831,9 @@ formularioServico.addEventListener("submit", async (evento) => {
     // Atualiza a lista a partir do Firestore após a confirmação da gravação.
     servicosCarregados = false;
     limparFormularioServico();
+    if (!estavaEditando) {
+      paginacoesAdministrativas.servicos.pagina = 1;
+    }
     const listaAtualizada = await carregarServicos(true);
     atualizarMensagemFormulario(
       listaAtualizada
@@ -1766,6 +1891,8 @@ async function excluirServico(id, nome) {
     // Atualiza a lista depois da exclusão confirmada no Firestore.
     servicosCarregados = false;
     const listaAtualizada = await carregarServicos(true);
+    // A renderização corrige automaticamente se a exclusão tiver removido a última página.
+    renderizarPaginacao("servicos", criarCartaoServico);
     atualizarMensagemFormulario(
       listaAtualizada
         ? "Serviço excluído com sucesso."
@@ -1784,7 +1911,7 @@ async function excluirServico(id, nome) {
   }
 }
 
-// Limpa mensagens de validação quando a Valeria corrige os campos do comentário.
+// Limpa mensagens de validação quando a Valéria corrige os campos do comentário.
 [campoNomeComentario, campoTextoComentario, campoAvaliacaoComentario].forEach((campo) => {
   campo.addEventListener("input", () => {
     campo.setCustomValidity("");
@@ -1833,6 +1960,9 @@ formularioComentario.addEventListener("submit", async (evento) => {
     // Atualiza a lista após a gravação confirmada no Firestore.
     comentariosCarregados = false;
     limparFormularioComentario();
+    if (!estavaEditando) {
+      paginacoesAdministrativas.comentarios.pagina = 1;
+    }
     const listaAtualizada = await carregarComentarios(true);
     atualizarMensagemFormularioComentario(
       listaAtualizada
@@ -1892,6 +2022,8 @@ async function excluirComentario(id, nome) {
     // Atualiza a lista depois da exclusão confirmada no Firestore.
     comentariosCarregados = false;
     const listaAtualizada = await carregarComentarios(true);
+    // A exclusão também recalcula o total e impede uma página vazia.
+    renderizarPaginacao("comentarios", criarCartaoComentario);
     atualizarMensagemFormularioComentario(
       listaAtualizada
         ? "Comentário excluído com sucesso."

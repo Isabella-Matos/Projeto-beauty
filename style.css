@@ -36,6 +36,10 @@
   --container-width: 1160px;
   --shadow-soft: 0 16px 42px rgba(67, 45, 37, 0.08);
   --transition: 180ms ease;
+
+  /* Brilho transversal da página inicial no tema claro. */
+--color-home-glow: rgba(255, 225, 230, 0.30);
+--color-home-band: rgba(255, 238, 240, 0.12);
 }
 
 /* O pink profundo permanece como base da página Experiências nos dois temas. */
@@ -71,6 +75,10 @@ body[data-theme="dark"] {
   --shadow-soft: 0 16px 42px rgba(0, 0, 0, 0.25);
   --shadow-card: 0 8px 28px rgba(0, 0, 0, 0.2);
   --shadow-button: 0 8px 20px rgba(0, 0, 0, 0.3);
+
+  /* Brilho adaptado ao fundo escuro, sem perder a tonalidade rosada. */
+--color-home-glow: rgba(255, 177, 196, 0.19);
+--color-home-band: rgba(255, 190, 205, 0.08);
 }
 
 * {
@@ -1376,21 +1384,31 @@ body[data-theme] #depoimentos {
   display: none !important;
 }
 
-/* Página inicial em duas colunas, com a identidade existente em destaque. */
+/* A página inicial usa o mesmo rosa da aba Comentários. */
 .page-panel[data-page="inicio"] {
   isolation: isolate;
   display: flex;
   align-items: stretch;
-  background: var(--color-about-bg);
+  background: var(--color-experience);
 }
 
+/* Luz suave em diagonal, preservando a cor sólida do fundo. */
 .page-panel[data-page="inicio"]::before {
   position: absolute;
   z-index: 0;
   inset: 0;
   background:
-    radial-gradient(ellipse at 76% 48%, var(--color-about-glow), transparent 50%),
-    linear-gradient(110deg, transparent 0 43%, var(--color-about-band) 52%, transparent 62%);
+    radial-gradient(
+      ellipse at 75% 35%,
+      var(--color-home-glow),
+      transparent 55%
+    ),
+    linear-gradient(
+      115deg,
+      transparent 25%,
+      var(--color-home-band) 50%,
+      transparent 75%
+    );
   content: "";
   pointer-events: none;
 }
@@ -1470,7 +1488,7 @@ body[data-theme] #depoimentos {
   fill: currentColor;
 }
 
-/* A moldura e o objeto contido preservam a proporção quadrada da logo oficial. */
+/* Exibe somente a logo, sem círculo branco, fundo rosa ou moldura. */
 .home-logo-frame {
   position: relative;
   display: grid;
@@ -1478,14 +1496,16 @@ body[data-theme] #depoimentos {
   aspect-ratio: 1;
   place-items: center;
   justify-self: center;
-  border: 1px solid var(--color-border);
+  border: none;
   border-radius: 50%;
-  background:
-    radial-gradient(circle, var(--color-surface) 0 53%, transparent 54%),
-    rgba(255, 254, 253, 0.24);
-  box-shadow: 0 22px 65px rgba(67, 45, 37, 0.12);
+  background: transparent;
+  box-shadow: none;
 }
 
+/* Remove a moldura interna decorativa. */
+.home-logo-frame::before {
+  display: none;
+}
 .home-logo-frame::before {
   position: absolute;
   inset: 12px;
@@ -1494,19 +1514,193 @@ body[data-theme] #depoimentos {
   content: "";
 }
 
+/* Realça somente a apresentação da logo, preservando o arquivo original e sua transparência. */
 .home-logo {
   position: relative;
   display: block;
-  width: 76%;
-  height: 76%;
+  width: 86%;
+  height: 86%;
   object-fit: contain;
+  filter: brightness(1.08) contrast(1.12) drop-shadow(0 12px 20px rgba(48, 37, 43, 0.28));
+}
+
+/* Realça a leitura e unifica os atalhos somente na página inicial. */
+.page-panel[data-page="inicio"] .home-copy h1,
+.page-panel[data-page="inicio"] .home-copy .eyebrow,
+.page-panel[data-page="inicio"] .home-specialties {
+  color: #fffefd;
+  text-shadow: 0 2px 12px rgba(48, 37, 43, 0.28);
+}
+
+.page-panel[data-page="inicio"] .home-specialties span {
+  color: #f8ccd7;
+  text-shadow: none;
+}
+
+/* Os três cards de acesso recebem o mesmo rosa, com texto branco para boa leitura. */
+.page-panel[data-page="inicio"] .home-actions .button {
+  border: 1px solid rgba(255, 254, 253, 0.24);
+  background: var(--color-rose-button);
+  color: #fffefd;
+  box-shadow: 0 10px 24px rgba(48, 37, 43, 0.18);
+}
+
+.page-panel[data-page="inicio"] .home-actions .button:hover,
+.page-panel[data-page="inicio"] .home-actions .button:focus-visible {
+  border-color: rgba(255, 254, 253, 0.52);
+  background: var(--color-rose-button-hover);
+  color: #fffefd;
+}
+
+/* Aplica a paleta rosa administrativa às abas Sobre, Serviços e Galeria. */
+.page-panel[data-page="sobre"] {
+  background: linear-gradient(135deg, #f7dce8 0%, #e9b5ca 100%);
+  color: #482638;
+}
+
+.page-panel[data-page="sobre"] > .about {
+  background: transparent;
+  color: #482638;
+}
+
+.page-panel[data-page="sobre"] .eyebrow,
+.page-panel[data-page="sobre"] .about-copy h2 em {
+  color: #85244f;
+}
+
+.page-panel[data-page="sobre"] .about-copy > p:not(.eyebrow) {
+  color: #482638;
+}
+
+.page-panel[data-page="servicos"] {
+  background: linear-gradient(135deg, #f7dce8 0%, #e9b5ca 100%);
+}
+
+.page-panel[data-page="servicos"] #servicos,
+.page-panel[data-page="galeria"] #galeria {
+  background: transparent;
+  color: #482638;
+}
+
+.page-panel[data-page="servicos"] .section-heading .eyebrow,
+.page-panel[data-page="servicos"] .section-heading h2,
+.page-panel[data-page="servicos"] .section-heading h2 em,
+.page-panel[data-page="servicos"] .section-heading > p:last-child,
+.page-panel[data-page="galeria"] .section-heading .eyebrow,
+.page-panel[data-page="galeria"] .section-heading h2,
+.page-panel[data-page="galeria"] .section-heading h2 em,
+.page-panel[data-page="galeria"] .section-heading > p:last-child,
+.page-panel[data-page="galeria"] .gallery-status {
+  color: #482638;
+}
+
+.page-panel[data-page="servicos"] .section-heading h2 em,
+.page-panel[data-page="servicos"] .section-heading .eyebrow,
+.page-panel[data-page="galeria"] .section-heading h2 em,
+.page-panel[data-page="galeria"] .section-heading .eyebrow {
+  color: #85244f;
+}
+
+.page-panel[data-page="servicos"] .service-card {
+  border-color: #e9b5ca;
+  background: #fffafd;
+  color: #482638;
+}
+
+.page-panel[data-page="servicos"] .service-card-featured {
+  background: #f7dce8;
+}
+
+.page-panel[data-page="servicos"] .service-card h3,
+.page-panel[data-page="servicos"] .service-number,
+.page-panel[data-page="servicos"] .service-icon,
+.page-panel[data-page="servicos"] .card-link {
+  color: #85244f;
+}
+
+.page-panel[data-page="servicos"] .service-card p,
+.page-panel[data-page="servicos"] .card-link span {
+  color: #482638;
+}
+
+.page-panel[data-page="servicos"] .service-icon {
+  border-color: #a83268;
+}
+
+.page-panel[data-page="galeria"] {
+  background: linear-gradient(135deg, #f7dce8 0%, #e9b5ca 100%);
+}
+
+/* Moldura branca fina e arredondada ao redor de cada foto da galeria. */
+.page-panel[data-page="galeria"] .gallery-item {
+  border: 3px solid #ffffff;
+  border-radius: 8px;
+  background: #f7dce8;
+}
+
+/* No tema escuro, usa o rosa escuro como base e mantém textos claros sobre ele. */
+body[data-theme="dark"] .page-panel[data-page="sobre"],
+body[data-theme="dark"] .page-panel[data-page="servicos"],
+body[data-theme="dark"] .page-panel[data-page="galeria"] {
+  background: #85244f;
+}
+
+body[data-theme="dark"] .page-panel[data-page="sobre"] > .about {
+  background: transparent;
+  color: #fffafd;
+}
+
+body[data-theme="dark"] .page-panel[data-page="sobre"] .eyebrow,
+body[data-theme="dark"] .page-panel[data-page="sobre"] .about-copy h2 em {
+  color: #e9b5ca;
+}
+
+body[data-theme="dark"] .page-panel[data-page="sobre"] .about-copy h2,
+body[data-theme="dark"] .page-panel[data-page="sobre"] .about-copy > p:not(.eyebrow),
+body[data-theme="dark"] .page-panel[data-page="servicos"] .section-heading h2,
+body[data-theme="dark"] .page-panel[data-page="servicos"] .section-heading > p:last-child,
+body[data-theme="dark"] .page-panel[data-page="galeria"] .section-heading h2,
+body[data-theme="dark"] .page-panel[data-page="galeria"] .section-heading > p:last-child,
+body[data-theme="dark"] .page-panel[data-page="galeria"] .gallery-status {
+  color: #fffafd;
+}
+
+body[data-theme="dark"] .page-panel[data-page="servicos"] .section-heading .eyebrow,
+body[data-theme="dark"] .page-panel[data-page="servicos"] .section-heading h2 em,
+body[data-theme="dark"] .page-panel[data-page="galeria"] .section-heading .eyebrow,
+body[data-theme="dark"] .page-panel[data-page="galeria"] .section-heading h2 em {
+  color: #e9b5ca;
+}
+
+body[data-theme="dark"] .page-panel[data-page="servicos"] .service-card {
+  border-color: #e9b5ca;
+  background: #f7dce8;
+  color: #482638;
+}
+
+body[data-theme="dark"] .page-panel[data-page="servicos"] .service-card-featured {
+  background: #fffafd;
+}
+
+body[data-theme="dark"] .page-panel[data-page="servicos"] .service-card h3,
+body[data-theme="dark"] .page-panel[data-page="servicos"] .service-number,
+body[data-theme="dark"] .page-panel[data-page="servicos"] .service-icon,
+body[data-theme="dark"] .page-panel[data-page="servicos"] .card-link,
+body[data-theme="dark"] .page-panel[data-page="servicos"] .service-card p,
+body[data-theme="dark"] .page-panel[data-page="servicos"] .card-link span {
+  color: #482638;
+}
+
+body[data-theme="dark"] .page-panel[data-page="galeria"] .gallery-item {
+  border: 3px solid #ffffff;
+  border-radius: 8px;
+  background: #f7dce8;
 }
 
 /* A página Sobre preserva seu texto em um painel independente da nova página inicial. */
 .page-panel[data-page="sobre"] {
   display: flex;
   align-items: stretch;
-  background: var(--color-about-bg);
 }
 
 .page-panel[data-page="sobre"] > .about {
