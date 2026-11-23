@@ -45,6 +45,9 @@ const telaLogin = document.getElementById("login-view");
 const telaPainel = document.getElementById("dashboard-view");
 const botaoSair = document.getElementById("logout-button");
 const mensagemPainel = document.getElementById("dashboard-message");
+// Controla a preferência visual exclusiva da área administrativa.
+const botaoTemaAdmin = document.getElementById("admin-theme-toggle");
+const CHAVE_TEMA_ADMIN = "valeria-beauty-admin-theme";
 
 // Localiza as áreas de estado e conteúdo da lista de serviços.
 const estadoServicos = document.getElementById("services-state");
@@ -125,6 +128,18 @@ const campoNomeEstabelecimento = document.getElementById("information-name");
 const campoWhatsappEstabelecimento = document.getElementById("information-whatsapp");
 const campoInstagramEstabelecimento = document.getElementById("information-instagram");
 const campoEnderecoEstabelecimento = document.getElementById("information-address");
+const campoHorarioSemana = document.getElementById("information-weekday-hours");
+const campoHorarioSabado = document.getElementById("information-saturday-hours");
+const campoFotoProfissional = document.getElementById("information-photo");
+const formularioCertificado = document.getElementById("certificate-form");
+const campoCaminhoCertificado = document.getElementById("certificate-path");
+const campoDescricaoCertificado = document.getElementById("certificate-description");
+const imagemPreviaCertificado = document.getElementById("certificate-preview-image");
+const estadoPreviaCertificado = document.getElementById("certificate-preview-state");
+const botaoSalvarCertificado = document.getElementById("certificate-save-button");
+const mensagemCertificado = document.getElementById("certificate-form-message");
+const estadoCertificados = document.getElementById("certificate-load-state");
+const listaCertificados = document.getElementById("certificate-list");
 const tituloFormularioInformacoes = document.getElementById("information-form-title");
 const botaoSalvarInformacoes = document.getElementById("information-save-button");
 const mensagemFormularioInformacoes = document.getElementById("information-form-message");
@@ -154,6 +169,8 @@ let requisicaoInformacoes = null;
 let informacoesCarregadas = false;
 let documentoInformacoesExiste = false;
 let operacaoInformacoesEmAndamento = false;
+let certificadosCarregados = false;
+let operacaoCertificadoEmAndamento = false;
 
 // Mantém a página e os documentos carregados independentemente em cada histórico.
 const paginacoesAdministrativas = {
@@ -185,6 +202,54 @@ const paginacoesAdministrativas = {
     status: statusPaginacaoComentarios
   }
 };
+
+// Recupera o tema apenas desta área administrativa, sem alterar o tema público.
+function lerTemaAdminSalvo() {
+  try {
+    return window.localStorage.getItem(CHAVE_TEMA_ADMIN) === "dark" ? "dark" : "light";
+  } catch (erro) {
+    console.error("Não foi possível ler o tema administrativo salvo:", erro);
+    return "light";
+  }
+}
+
+// Aplica e, opcionalmente, salva o tema do painel administrativo.
+function aplicarTemaAdmin(tema, persistir = false) {
+  const temaAtivo = tema === "dark" ? "dark" : "light";
+  document.body.dataset.adminTheme = temaAtivo;
+
+  if (botaoTemaAdmin instanceof HTMLButtonElement) {
+    const modoEscuro = temaAtivo === "dark";
+    botaoTemaAdmin.setAttribute("aria-pressed", String(modoEscuro));
+    botaoTemaAdmin.setAttribute(
+      "aria-label",
+      modoEscuro ? "Ativar modo claro" : "Ativar modo escuro"
+    );
+    botaoTemaAdmin.querySelector(".theme-toggle-icon").textContent = modoEscuro ? "☀" : "☾";
+    botaoTemaAdmin.querySelector(".theme-toggle-label").textContent =
+      modoEscuro ? "Modo claro" : "Modo escuro";
+  }
+
+  if (persistir) {
+    try {
+      window.localStorage.setItem(CHAVE_TEMA_ADMIN, temaAtivo);
+    } catch (erro) {
+      console.error("Não foi possível salvar o tema administrativo:", erro);
+    }
+  }
+}
+
+// Restaura a preferência antes da interação e alterna o tema no painel.
+aplicarTemaAdmin(lerTemaAdminSalvo());
+
+if (botaoTemaAdmin instanceof HTMLButtonElement) {
+  botaoTemaAdmin.addEventListener("click", () => {
+    aplicarTemaAdmin(
+      document.body.dataset.adminTheme === "dark" ? "light" : "dark",
+      true
+    );
+  });
+}
 
 // Confere a conta atual antes de qualquer consulta ou gravação administrativa.
 function proprietariaAutorizada() {
@@ -1268,7 +1333,111 @@ function definirFormularioInformacoesOcupado(ocupado) {
   campoWhatsappEstabelecimento.disabled = ocupado;
   campoInstagramEstabelecimento.disabled = ocupado;
   campoEnderecoEstabelecimento.disabled = ocupado;
+  campoHorarioSemana.disabled = ocupado;
+  campoHorarioSabado.disabled = ocupado;
+  campoFotoProfissional.disabled = ocupado;
   botaoSalvarInformacoes.disabled = ocupado || !informacoesCarregadas;
+}
+
+// Mantém a prévia e a administração dos certificados restritas à conta autorizada.
+function atualizarPreviaCertificado() {
+  const caminho = getLocalGalleryPath(campoCaminhoCertificado.value);
+  campoCaminhoCertificado.setCustomValidity(
+    caminho ? "" : "Informe um caminho direto para uma imagem dentro de imagens/."
+  );
+  imagemPreviaCertificado.hidden = true;
+  imagemPreviaCertificado.removeAttribute("src");
+
+  if (!caminho) {
+    estadoPreviaCertificado.textContent = "Informe um caminho válido para ver a prévia.";
+    botaoSalvarCertificado.disabled = true;
+    return;
+  }
+
+  estadoPreviaCertificado.textContent = "Carregando prévia...";
+  imagemPreviaCertificado.onload = () => {
+    estadoPreviaCertificado.textContent = "";
+    imagemPreviaCertificado.hidden = false;
+    botaoSalvarCertificado.disabled = operacaoCertificadoEmAndamento;
+  };
+  imagemPreviaCertificado.onerror = () => {
+    estadoPreviaCertificado.textContent =
+      "Não foi possível carregar esse arquivo. Confira se ele existe dentro de imagens/.";
+    botaoSalvarCertificado.disabled = true;
+  };
+  imagemPreviaCertificado.src = caminho;
+}
+
+async function carregarCertificados() {
+  if (!proprietariaAutorizada()) return false;
+  if (certificadosCarregados) return true;
+
+  estadoCertificados.textContent = "Carregando certificados...";
+  estadoCertificados.hidden = false;
+  listaCertificados.replaceChildren();
+
+  try {
+    const resultado = await getDocs(collection(db, "certificados"));
+    const cards = resultado.docs.map((documento) => {
+      const certificado = documento.data();
+      const caminho = getLocalGalleryPath(certificado.caminho);
+      const descricao =
+        typeof certificado.descricao === "string" ? certificado.descricao.trim() : "";
+      const card = document.createElement("article");
+      card.className = "gallery-admin-card";
+
+      const image = document.createElement("img");
+      image.className = "gallery-admin-card-image";
+      image.alt = descricao || "Certificado";
+      if (caminho) image.src = caminho;
+
+      const title = document.createElement("h2");
+      title.textContent = descricao || "Certificado sem descrição";
+      const path = document.createElement("p");
+      path.className = "gallery-admin-card-path";
+      path.textContent = typeof certificado.caminho === "string"
+        ? `Caminho: ${certificado.caminho}`
+        : "Caminho não informado.";
+
+      const actions = document.createElement("div");
+      actions.className = "service-admin-actions";
+      const remove = document.createElement("button");
+      remove.type = "button";
+      remove.className = "service-action-button service-delete-button";
+      remove.textContent = "Excluir";
+      remove.addEventListener("click", async () => {
+        if (!proprietariaAutorizada() || operacaoCertificadoEmAndamento) return;
+        operacaoCertificadoEmAndamento = true;
+        try {
+          await deleteDoc(doc(db, "certificados", documento.id));
+          certificadosCarregados = false;
+          await carregarCertificados();
+          mensagemCertificado.textContent = "Certificado excluído com sucesso.";
+        } catch (erro) {
+          console.error("Não foi possível excluir o certificado:", erro);
+          mensagemCertificado.textContent = "Não foi possível excluir o certificado.";
+        } finally {
+          operacaoCertificadoEmAndamento = false;
+        }
+      });
+      actions.append(remove);
+      card.append(image, title, path, actions);
+      return card;
+    });
+
+    listaCertificados.replaceChildren(...cards);
+    certificadosCarregados = true;
+    estadoCertificados.textContent = resultado.empty
+      ? "Nenhum certificado cadastrado."
+      : "";
+    estadoCertificados.hidden = resultado.empty ? false : true;
+    return true;
+  } catch (erro) {
+    console.error("Não foi possível carregar os certificados:", erro);
+    estadoCertificados.textContent = "Não foi possível carregar os certificados.";
+    estadoCertificados.hidden = false;
+    return false;
+  }
 }
 
 // Limpa valores e estados sensíveis ao encerrar ou trocar a sessão administrativa.
@@ -1290,6 +1459,9 @@ function validarInformacoes() {
   const digitosWhatsapp = whatsapp.replace(/\D/g, "");
   const instagramInformado = campoInstagramEstabelecimento.value.trim();
   const endereco = campoEnderecoEstabelecimento.value.trim();
+  const horarioSemana = campoHorarioSemana.value.trim();
+  const horarioSabado = campoHorarioSabado.value.trim();
+  const fotoCaminho = getLocalGalleryPath(campoFotoProfissional.value);
   let urlInstagram = null;
 
   try {
@@ -1319,6 +1491,17 @@ function validarInformacoes() {
   campoEnderecoEstabelecimento.setCustomValidity(
     endereco.length < 5 ? "Informe um endereço com pelo menos 5 caracteres." : ""
   );
+  campoHorarioSemana.setCustomValidity(
+    horarioSemana.length < 3 ? "Informe o horário de segunda a sexta." : ""
+  );
+  campoHorarioSabado.setCustomValidity(
+    horarioSabado.length < 3 ? "Informe o horário de sábado." : ""
+  );
+  campoFotoProfissional.setCustomValidity(
+    campoFotoProfissional.value.trim() && !fotoCaminho
+      ? "Informe um caminho direto para uma imagem dentro de imagens/."
+      : ""
+  );
 
   if (!formularioInformacoes.checkValidity()) {
     formularioInformacoes.reportValidity();
@@ -1329,7 +1512,10 @@ function validarInformacoes() {
     nome,
     whatsapp,
     instagram: urlInstagram.href,
-    endereco
+    endereco,
+    horarioSemana,
+    horarioSabado,
+    fotoCaminho: campoFotoProfissional.value.trim()
   };
 }
 
@@ -1371,6 +1557,16 @@ async function carregarInformacoes() {
           typeof informacoes.instagram === "string" ? informacoes.instagram : "";
         campoEnderecoEstabelecimento.value =
           typeof informacoes.endereco === "string" ? informacoes.endereco : "";
+        campoHorarioSemana.value =
+          typeof informacoes.horarioSemana === "string"
+            ? informacoes.horarioSemana
+            : "13:00 às 18:00";
+        campoHorarioSabado.value =
+          typeof informacoes.horarioSabado === "string"
+            ? informacoes.horarioSabado
+            : "08:00 às 16:00";
+        campoFotoProfissional.value =
+          typeof informacoes.fotoCaminho === "string" ? informacoes.fotoCaminho : "";
         documentoInformacoesExiste = true;
         atualizarEstadoInformacoes("");
       } else {
@@ -1641,6 +1837,9 @@ function ativarSecao(secaoSelecionada) {
   if (secaoSelecionada === "information") {
     void carregarInformacoes();
   }
+  if (secaoSelecionada === "about") {
+    void carregarCertificados();
+  }
 }
 
 // Conecta cada item do menu à sua seção central.
@@ -1701,7 +1900,10 @@ Object.values(formulariosOrientacoes).forEach((configuracao) => {
   campoNomeEstabelecimento,
   campoWhatsappEstabelecimento,
   campoInstagramEstabelecimento,
-  campoEnderecoEstabelecimento
+  campoEnderecoEstabelecimento,
+  campoHorarioSemana,
+  campoHorarioSabado,
+  campoFotoProfissional
 ].forEach((campo) => {
   campo.addEventListener("input", () => {
     campo.setCustomValidity("");
@@ -1709,6 +1911,53 @@ Object.values(formulariosOrientacoes).forEach((configuracao) => {
   campo.addEventListener("change", () => {
     campo.setCustomValidity("");
   });
+});
+
+campoCaminhoCertificado.addEventListener("input", atualizarPreviaCertificado);
+campoCaminhoCertificado.addEventListener("change", atualizarPreviaCertificado);
+
+formularioCertificado.addEventListener("submit", async (evento) => {
+  evento.preventDefault();
+  if (!proprietariaAutorizada()) {
+    mensagemCertificado.textContent =
+      "Somente a conta autorizada pode cadastrar certificados.";
+    return;
+  }
+  if (operacaoCertificadoEmAndamento) return;
+
+  const caminho = getLocalGalleryPath(campoCaminhoCertificado.value);
+  const descricao = campoDescricaoCertificado.value.trim();
+  campoCaminhoCertificado.setCustomValidity(
+    caminho ? "" : "Informe um caminho direto para uma imagem dentro de imagens/."
+  );
+  campoDescricaoCertificado.setCustomValidity(
+    descricao.length >= 2 && descricao.length <= 300
+      ? ""
+      : "Informe uma descrição entre 2 e 300 caracteres."
+  );
+  if (!formularioCertificado.checkValidity()) {
+    formularioCertificado.reportValidity();
+    return;
+  }
+
+  operacaoCertificadoEmAndamento = true;
+  botaoSalvarCertificado.disabled = true;
+  try {
+    await addDoc(collection(db, "certificados"), { caminho, descricao });
+    formularioCertificado.reset();
+    imagemPreviaCertificado.hidden = true;
+    estadoPreviaCertificado.textContent =
+      "Informe um caminho válido para ver a prévia.";
+    certificadosCarregados = false;
+    await carregarCertificados();
+    mensagemCertificado.textContent = "Certificado cadastrado com sucesso.";
+  } catch (erro) {
+    console.error("Não foi possível cadastrar o certificado:", erro);
+    mensagemCertificado.textContent =
+      "Não foi possível cadastrar o certificado.";
+  } finally {
+    operacaoCertificadoEmAndamento = false;
+  }
 });
 
 // Cria ou atualiza o documento de informações após validar a conta e os campos.

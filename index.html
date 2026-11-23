@@ -92,16 +92,42 @@
     <!-- Mantém a apresentação profissional em uma página própria, sem duplicar o antigo banner. -->
     <div class="page-panel" data-page="sobre" aria-labelledby="about-title" hidden>
     <section class="about section-space" id="sobre" aria-labelledby="about-title">
-      <div class="container about-grid">
+      <div class="container about-layout">
+        <!-- A fotografia real será adicionada futuramente pelo painel administrativo. -->
+        <figure class="professional-photo-card" aria-label="Foto da profissional Valéria Santos">
+          <img
+            class="professional-photo"
+            data-professional-photo
+            alt="Valéria Santos"
+            hidden
+          >
+          <div class="professional-photo-placeholder" data-professional-photo-placeholder>
+            <span aria-hidden="true">VS</span>
+            <p>Foto da profissional</p>
+          </div>
+        </figure>
         <div class="about-copy">
           <p class="eyebrow">Sobre a profissional</p>
           <h2 id="about-title">Prazer, sou <em>Valéria Santos.</em></h2>
-          <p>“Minha missão é elevar sua autoestima”.</p>
-          <p>
-            Realizo serviços de sobrancelhas e epilação. Será um prazer receber você.
-          </p>
+          <p>A Valéria acredita que cada pessoa merece um momento de cuidado, beleza e autoestima.</p>
+          <p>Com dedicação e carinho em cada atendimento, busca oferecer uma experiência acolhedora, valorizando a beleza natural e respeitando a individualidade de cada cliente.</p>
+          <p>Sua trajetória também é marcada pela busca constante por conhecimento e aperfeiçoamento profissional, incluindo sua formação em curso com Patricia Mafra.</p>
         </div>
       </div>
+      <!-- Área reservada para certificados e diplomas adicionados pela proprietária. -->
+      <section class="professional-training" aria-labelledby="training-title">
+        <div class="container">
+          <p class="eyebrow">Qualificação profissional</p>
+          <h2 id="training-title">Formação e aperfeiçoamento</h2>
+          <p>A qualificação profissional faz parte da sua trajetória. Este espaço será dedicado à apresentação de seus certificados e cursos, permitindo que as clientes conheçam melhor sua formação.</p>
+          <div class="certificate-grid" id="certificate-list" aria-live="polite">
+            <article class="certificate-placeholder">
+              <span aria-hidden="true">Certificado</span>
+              <p>Espaço reservado para diploma ou certificado.</p>
+            </article>
+          </div>
+        </div>
+      </section>
     </section>
     </div>
 
@@ -117,7 +143,6 @@
 
         <div class="service-grid">
           <article class="service-card">
-            <span class="service-number" aria-hidden="true">01</span>
             <div class="service-icon" aria-hidden="true">✳</div>
             <h3>Sobrancelhas</h3>
             <p>Serviços para sobrancelhas. Consulte opções e informações diretamente com Valéria.</p>
@@ -133,7 +158,6 @@
           </article>
 
           <article class="service-card service-card-featured">
-            <span class="service-number" aria-hidden="true">02</span>
             <div class="service-icon" aria-hidden="true">〰</div>
             <h3>Epilação</h3>
             <p>Epilação. Consulte as áreas atendidas e informações diretamente com Valéria.</p>
@@ -230,6 +254,20 @@
           Avenida Doutor Rossini de Minas, 222<br>
           São Joaquim de Bicas - MG
         </address>
+        <!-- Horários editáveis carregados junto aos dados públicos do estabelecimento. -->
+        <section class="business-hours" aria-labelledby="business-hours-title">
+          <h3 id="business-hours-title">Horário de atendimento</h3>
+          <dl>
+            <div>
+              <dt>Segunda a sexta</dt>
+              <dd data-business-hours-weekdays>13:00 às 18:00</dd>
+            </div>
+            <div>
+              <dt>Sábado</dt>
+              <dd data-business-hours-saturday>08:00 às 16:00</dd>
+            </div>
+          </dl>
+        </section>
         <a
           class="contact-map-link"
           id="contact-map-link"

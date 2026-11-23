@@ -9,6 +9,19 @@
   --surface: #fffafd;
 }
 
+/* Mantém as cores do modo escuro exclusivas ao painel administrativo. */
+body[data-admin-theme="dark"] {
+  --pink: #df79a5;
+  --pink-dark: #f09abd;
+  --pink-soft: #4a2939;
+  --pink-border: #664052;
+  --ink: #f8edf3;
+  --muted: #d0bcc6;
+  --surface: #20151d;
+  color-scheme: dark;
+  background: linear-gradient(135deg, #171116, #2a1822);
+}
+
 /* Remove margens e ajusta o cálculo dos tamanhos. */
 * {
   margin: 0;
@@ -178,6 +191,35 @@ body {
   padding: 22px 30px;
   border-bottom: 1px solid var(--pink-border);
   background: rgba(255, 255, 255, 0.72);
+}
+
+/* Agrupa os controles visíveis no cabeçalho do painel. */
+.dashboard-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Apresenta o alternador de tema sem alterar o visual da página pública. */
+.theme-toggle-button {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border: 1px solid var(--pink-border);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--pink);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.theme-toggle-button:hover {
+  border-color: var(--pink);
+  background: var(--pink-soft);
 }
 
 /* Destaca o nome do negócio no cabeçalho. */
@@ -865,4 +907,94 @@ body {
     flex-basis: 46px;
     border-radius: 14px;
   }
+
+  .dashboard-header-actions {
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  .theme-toggle-label {
+    display: none;
+  }
+
+  .theme-toggle-button {
+    min-width: 42px;
+    justify-content: center;
+  }
+}
+
+/* Contraste do modo escuro em cartões e campos que possuem fundo claro explícito. */
+body[data-admin-theme="dark"] .login-card,
+body[data-admin-theme="dark"] .dashboard,
+body[data-admin-theme="dark"] .dashboard-header,
+body[data-admin-theme="dark"] .dashboard-nav,
+body[data-admin-theme="dark"] .service-editor-card,
+body[data-admin-theme="dark"] .gallery-preview-card,
+body[data-admin-theme="dark"] .gallery-admin-card,
+body[data-admin-theme="dark"] .service-admin-card,
+body[data-admin-theme="dark"] .welcome-card,
+body[data-admin-theme="dark"] .placeholder-card,
+body[data-admin-theme="dark"] .services-state,
+body[data-admin-theme="dark"] .admin-pagination-button,
+body[data-admin-theme="dark"] .service-action-button,
+body[data-admin-theme="dark"] .service-cancel-button {
+  background: #261a21;
+  color: var(--ink);
+}
+
+body[data-admin-theme="dark"] .dashboard-header {
+  background: rgba(32, 21, 29, 0.96);
+}
+
+body[data-admin-theme="dark"] .dashboard-nav {
+  background: linear-gradient(180deg, #261a21, #20151d);
+}
+
+body[data-admin-theme="dark"] .nav-button {
+  color: #dcc8d2;
+}
+
+body[data-admin-theme="dark"] .nav-button:hover,
+body[data-admin-theme="dark"] .nav-button.active {
+  background: #4a2939;
+  color: #f09abd;
+}
+
+body[data-admin-theme="dark"] .service-form-field input,
+body[data-admin-theme="dark"] .service-form-field textarea,
+body[data-admin-theme="dark"] .service-form-field select,
+body[data-admin-theme="dark"] #login-form input {
+  border-color: #664052;
+  background: #171116;
+  color: var(--ink);
+}
+
+body[data-admin-theme="dark"] .service-form-field label,
+body[data-admin-theme="dark"] #login-form label {
+  color: #eccfdc;
+}
+
+body[data-admin-theme="dark"] .nav-heading,
+body[data-admin-theme="dark"] .menu-index,
+body[data-admin-theme="dark"] .subtitle,
+body[data-admin-theme="dark"] .brand-caption {
+  color: #bfa4b1;
+}
+
+body[data-admin-theme="dark"] .welcome-card,
+body[data-admin-theme="dark"] .placeholder-card,
+body[data-admin-theme="dark"] .service-editor-card,
+body[data-admin-theme="dark"] .services-state {
+  border-color: var(--pink-border);
+}
+
+body[data-admin-theme="dark"] .service-action-button,
+body[data-admin-theme="dark"] .admin-pagination-button,
+body[data-admin-theme="dark"] .service-cancel-button {
+  border-color: #664052;
+  color: #f09abd;
+}
+
+body[data-admin-theme="dark"] .service-admin-price {
+  border-top-color: #664052;
 }

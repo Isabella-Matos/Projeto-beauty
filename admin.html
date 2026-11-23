@@ -87,10 +87,18 @@
           <p class="brand-caption">Painel administrativo</p>
         </div>
 
-        <!-- Botão para encerrar a sessão autenticada -->
-        <button type="button" class="logout-button" id="logout-button">
-          Sair da conta
-        </button>
+        <div class="dashboard-header-actions">
+          <!-- Alterna apenas o tema deste painel administrativo e salva a preferência. -->
+          <button type="button" class="theme-toggle-button" id="admin-theme-toggle" aria-label="Ativar modo escuro" aria-pressed="false">
+            <span class="theme-toggle-icon" aria-hidden="true">☾</span>
+            <span class="theme-toggle-label">Modo escuro</span>
+          </button>
+
+          <!-- Botão para encerrar a sessão autenticada -->
+          <button type="button" class="logout-button" id="logout-button">
+            Sair da conta
+          </button>
+        </div>
       </header>
 
       <!-- Mensagem acessível para falhas ao encerrar a sessão -->
@@ -128,6 +136,10 @@
           <button type="button" class="nav-button" data-section="information">
             <span class="menu-index" aria-hidden="true">06</span>
             <span>Informações</span>
+          </button>
+          <button type="button" class="nav-button" data-section="about">
+            <span class="menu-index" aria-hidden="true">07</span>
+            <span>Sobre a profissional</span>
           </button>
         </nav>
 
@@ -368,6 +380,56 @@
             </nav>
           </section>
 
+          <!-- Gerencia certificados exibidos na página pública Sobre. -->
+          <section class="content-panel" data-panel="about" hidden>
+            <p class="eyebrow">Trajetória profissional</p>
+            <h1>Sobre a profissional</h1>
+            <p class="panel-intro">Cadastre certificados e diplomas já existentes na pasta imagens/.</p>
+
+            <section class="service-editor-card" aria-labelledby="certificate-form-title">
+              <div class="service-editor-heading">
+                <h2 id="certificate-form-title">Adicionar certificado</h2>
+                <p>Informe o caminho local e uma descrição clara do documento.</p>
+              </div>
+              <form id="certificate-form" class="service-form">
+                <div class="service-form-field">
+                  <label for="certificate-path">Caminho do arquivo</label>
+                  <input
+                    id="certificate-path"
+                    name="caminho"
+                    type="text"
+                    maxlength="300"
+                    autocomplete="off"
+                    placeholder="imagens/certificado.png"
+                    required
+                  >
+                </div>
+                <div class="service-form-field">
+                  <label for="certificate-description">Descrição do certificado</label>
+                  <input
+                    id="certificate-description"
+                    name="descricao"
+                    type="text"
+                    minlength="2"
+                    maxlength="300"
+                    required
+                  >
+                </div>
+                <div class="gallery-preview-card" aria-live="polite">
+                  <img class="gallery-admin-preview" id="certificate-preview-image" alt="" hidden>
+                  <p class="gallery-preview-state" id="certificate-preview-state">Informe um caminho válido para ver a prévia.</p>
+                </div>
+                <div class="service-form-actions">
+                  <button type="submit" class="service-save-button" id="certificate-save-button" disabled>Adicionar certificado</button>
+                </div>
+                <p class="service-form-message" id="certificate-form-message" role="status" aria-live="polite"></p>
+              </form>
+            </section>
+
+            <p class="services-state" id="certificate-load-state" role="status" aria-live="polite" hidden></p>
+            <div class="gallery-admin-list" id="certificate-list" aria-live="polite"></div>
+          </section>
+
           <!-- Gerenciamento administrativo de depoimentos cadastrados no Firestore -->
           <section class="content-panel" data-panel="comments" hidden>
             <p class="eyebrow">Atendimento</p>
@@ -512,6 +574,42 @@
                     maxlength="300"
                     required
                   ></textarea>
+                </div>
+
+                <div class="service-form-field">
+                  <label for="information-weekday-hours">Horário de segunda a sexta</label>
+                  <input
+                    id="information-weekday-hours"
+                    name="horarioSemana"
+                    type="text"
+                    maxlength="100"
+                    value="13:00 às 18:00"
+                    required
+                  >
+                </div>
+
+                <div class="service-form-field">
+                  <label for="information-saturday-hours">Horário de sábado</label>
+                  <input
+                    id="information-saturday-hours"
+                    name="horarioSabado"
+                    type="text"
+                    maxlength="100"
+                    value="08:00 às 16:00"
+                    required
+                  >
+                </div>
+
+                <div class="service-form-field">
+                  <label for="information-photo">Foto da profissional (caminho local)</label>
+                  <input
+                    id="information-photo"
+                    name="fotoCaminho"
+                    type="text"
+                    maxlength="300"
+                    autocomplete="off"
+                    placeholder="imagens/foto-valeria.png"
+                  >
                 </div>
 
                 <!-- Informa o resultado e diferencia o cadastro inicial da edição -->

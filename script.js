@@ -21,7 +21,10 @@ const CONTATOS = {
   nome: "Valéria Santos Beauty",
   whatsapp: "5531972321537",
   instagram: "https://www.instagram.com/valeriasantos.beauty/",
-  endereco: "Avenida Doutor Rossini de Minas, 222, São Joaquim de Bicas - MG"
+  endereco: "Avenida Doutor Rossini de Minas, 222, São Joaquim de Bicas - MG",
+  horarioSemana: "13:00 às 18:00",
+  horarioSabado: "08:00 às 16:00",
+  fotoCaminho: ""
 };
 const WHATSAPP_MESSAGE =
   "Olá, Valéria! Conheci seu site e gostaria de agendar um horário. Poderia me passar mais informações?";
@@ -56,6 +59,11 @@ const testimonialsStatus = document.querySelector("#testimonials-status");
 // Localiza os textos e links públicos que recebem os dados do estabelecimento.
 const businessNameLabels = Array.from(document.querySelectorAll("[data-business-name]"));
 const businessAddressLabels = Array.from(document.querySelectorAll("[data-business-address]"));
+const businessWeekdayHours = Array.from(document.querySelectorAll("[data-business-hours-weekdays]"));
+const businessSaturdayHours = Array.from(document.querySelectorAll("[data-business-hours-saturday]"));
+const professionalPhoto = document.querySelector("[data-professional-photo]");
+const professionalPhotoPlaceholder = document.querySelector("[data-professional-photo-placeholder]");
+const certificateList = document.querySelector("#certificate-list");
 const contactInfoStatus = document.querySelector("#contact-info-status");
 const contactMapLink = document.querySelector("#contact-map-link");
 // Localiza o contêiner público da galeria e seu estado de leitura.
@@ -207,10 +215,16 @@ function renderServicesDialog(categoriaSelecionada) {
         const linhas = servicosDaCategoria.map((documento) => {
           const servico = documento.data();
           const linha = document.createElement("tr");
+          // Ajusta somente a apresentação solicitada, sem alterar o cadastro no Firebase.
+          const nomeExibido =
+            typeof servico.procedimento === "string"
+              ? servico.procedimento.trim().replace(
+                  /epila[cç][aã]o de virilha|epilacao de virilha/gi,
+                  "Virilha completa"
+                )
+              : "";
           const valores = [
-            typeof servico.procedimento === "string" && servico.procedimento.trim()
-              ? servico.procedimento.trim()
-              : "Serviço sem nome",
+            nomeExibido || "Serviço sem nome",
             formatarPrecoServico(servico.preco)
           ];
 
@@ -446,6 +460,17 @@ function normalizePublicInformation(data) {
   const instagramValue =
     typeof data.instagram === "string" ? data.instagram.trim() : "";
   const endereco = typeof data.endereco === "string" ? data.endereco.trim() : "";
+  // Mantém compatibilidade com documentos antigos e não cria horário para domingo.
+  const horarioSemana =
+    typeof data.horarioSemana === "string" && data.horarioSemana.trim()
+      ? data.horarioSemana.trim()
+      : CONTATOS.horarioSemana;
+  const horarioSabado =
+    typeof data.horarioSabado === "string" && data.horarioSabado.trim()
+      ? data.horarioSabado.trim()
+      : CONTATOS.horarioSabado;
+  const fotoCaminho =
+    typeof data.fotoCaminho === "string" ? data.fotoCaminho.trim() : "";
   let instagram;
 
   try {
@@ -462,7 +487,9 @@ function normalizePublicInformation(data) {
     instagram.protocol !== "https:" ||
     !["instagram.com", "www.instagram.com"].includes(instagram.hostname) ||
     !endereco ||
-    endereco.length > 300
+    endereco.length > 300 ||
+    horarioSemana.length > 100 ||
+    horarioSabado.length > 100
   ) {
     return null;
   }
@@ -472,7 +499,10 @@ function normalizePublicInformation(data) {
     nome: nome.replace(/\bValeria\b/g, "Valéria"),
     whatsapp,
     instagram: instagram.href,
-    endereco
+    endereco,
+    horarioSemana,
+    horarioSabado,
+    fotoCaminho
   };
 }
 
@@ -484,6 +514,38 @@ function applyPublicInformation(information) {
   businessAddressLabels.forEach((label) => {
     label.textContent = information.endereco;
   });
+  businessWeekdayHours.forEach((label) => {
+    label.textContent = information.horarioSemana;
+  });
+  businessSaturdayHours.forEach((label) => {
+    label.textContent = information.horarioSabado;
+  });
+
+  // Exibe a foto real somente quando a proprietária cadastrar um caminho local válido.
+  if (professionalPhoto instanceof HTMLImageElement) {
+    const caminhoFoto = getLocalGalleryPath(information.fotoCaminho);
+    if (caminhoFoto) {
+      professionalPhoto.hidden = false;
+      professionalPhoto.src = caminhoFoto;
+      professionalPhoto.alt = "Valéria Santos";
+      if (professionalPhotoPlaceholder instanceof HTMLElement) {
+        professionalPhotoPlaceholder.hidden = true;
+      }
+      professionalPhoto.addEventListener("error", () => {
+        professionalPhoto.hidden = true;
+        professionalPhoto.removeAttribute("src");
+        if (professionalPhotoPlaceholder instanceof HTMLElement) {
+          professionalPhotoPlaceholder.hidden = false;
+        }
+      }, { once: true });
+    } else {
+      professionalPhoto.hidden = true;
+      professionalPhoto.removeAttribute("src");
+      if (professionalPhotoPlaceholder instanceof HTMLElement) {
+        professionalPhotoPlaceholder.hidden = false;
+      }
+    }
+  }
 
   instagramLinks.forEach((link) => {
     link.href = information.instagram;
@@ -504,8 +566,8 @@ function applyPublicInformation(information) {
 
   const formattedNumber =
     information.whatsapp.length === 13 && information.whatsapp.startsWith("55")
-      ? `+55 (${information.whatsapp.slice(2, 4)}) ${information.whatsapp.slice(4, 9)}-${information.whatsapp.slice(9)}`
-      : `+${information.whatsapp}`;
+      ? `(${information.whatsapp.slice(2, 4)}) ${information.whatsapp.slice(4, 9)}-${information.whatsapp.slice(9)}`
+      : information.whatsapp;
 
   whatsappNumberLabels.forEach((label) => {
     label.textContent = formattedNumber;
@@ -526,6 +588,7 @@ function applyPublicInformation(information) {
 
 // Mantém a escuta do documento de informações somente enquanto a seção está aberta.
 let unsubscribeInformation = null;
+let unsubscribeCertificates = null;
 
 // Atualiza em tempo real os dados de contato, sem expor controles de edição ao público.
 function renderPublicInformation() {
@@ -766,6 +829,51 @@ if (
   console.error("Não foi possível inicializar o quadro de serviços.");
 }
 
+// Carrega certificados reais da coleção pública somente na página Sobre.
+function renderPublicCertificates() {
+  if (!(certificateList instanceof HTMLElement) || unsubscribeCertificates) return;
+
+  unsubscribeCertificates = onSnapshot(
+    collection(db, "certificados"),
+    (resultado) => {
+      if (resultado.empty) {
+        certificateList.innerHTML =
+          '<article class="certificate-placeholder"><span aria-hidden="true">Certificado</span><p>Espaço reservado para diploma ou certificado.</p></article>';
+        return;
+      }
+
+      const cards = resultado.docs.map((documento) => {
+        const certificate = documento.data();
+        const caminho = getLocalGalleryPath(certificate.caminho);
+        const descricao =
+          typeof certificate.descricao === "string" ? certificate.descricao.trim() : "";
+        if (!caminho || !descricao) return null;
+
+        const card = document.createElement("article");
+        card.className = "certificate-card";
+        const image = document.createElement("img");
+        image.src = caminho;
+        image.alt = descricao;
+        image.loading = "lazy";
+        image.addEventListener("error", () => card.remove());
+        const caption = document.createElement("p");
+        caption.textContent = descricao;
+        card.append(image, caption);
+        return card;
+      }).filter(Boolean);
+
+      certificateList.replaceChildren(
+        ...(cards.length
+          ? cards
+          : [Object.assign(document.createElement("article"), { className: "certificate-placeholder", innerHTML: '<span aria-hidden="true">Certificado</span><p>Espaço reservado para diploma ou certificado.</p>' })])
+      );
+    },
+    (error) => {
+      console.error("Não foi possível carregar os certificados públicos.", error);
+    }
+  );
+}
+
 function getPageFromHash() {
   const sectionId = decodeURIComponent(window.location.hash.slice(1));
   const target = document.getElementById(sectionId);
@@ -792,6 +900,11 @@ function showPage(pageId, updateHistory = false) {
   if (pageId !== "contato" && unsubscribeInformation) {
     unsubscribeInformation();
     unsubscribeInformation = null;
+  }
+
+  if (pageId !== "sobre" && unsubscribeCertificates) {
+    unsubscribeCertificates();
+    unsubscribeCertificates = null;
   }
 
   pagePanels.forEach((panel) => {
@@ -821,6 +934,10 @@ function showPage(pageId, updateHistory = false) {
   // Carrega e acompanha os dados do estabelecimento ao abrir a seção de informações.
   if (pageId === "contato") {
     renderPublicInformation();
+  }
+
+  if (pageId === "sobre") {
+    renderPublicCertificates();
   }
 
   if (updateHistory && window.location.hash !== `#${pageId}`) {

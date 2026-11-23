@@ -78,6 +78,22 @@ service cloud.firestore {
         && request.auth.uid == "lTpeBYIEhFaAYDWKnyN6scmh9c33";
     }
 
+    // Certificados são públicos somente para leitura e editáveis pela proprietária.
+    match /certificados/{certificateId} {
+      allow read: if true;
+      allow create, update: if request.auth != null
+        && request.auth.uid == "lTpeBYIEhFaAYDWKnyN6scmh9c33"
+        && request.resource.data.keys().hasAll(["caminho", "descricao"])
+        && request.resource.data.keys().hasOnly(["caminho", "descricao"])
+        && request.resource.data.caminho is string
+        && request.resource.data.caminho.size() <= 300
+        && request.resource.data.descricao is string
+        && request.resource.data.descricao.size() >= 2
+        && request.resource.data.descricao.size() <= 300;
+      allow delete: if request.auth != null
+        && request.auth.uid == "lTpeBYIEhFaAYDWKnyN6scmh9c33";
+    }
+
     // Informações públicas são legíveis por todos e graváveis apenas pela conta da Valeria.
     match /informacoes/estabelecimento {
       allow read: if true;
@@ -93,7 +109,10 @@ service cloud.firestore {
           "nome",
           "whatsapp",
           "instagram",
-          "endereco"
+          "endereco",
+          "horarioSemana",
+          "horarioSabado",
+          "fotoCaminho"
         ])
         && request.resource.data.nome is string
         && request.resource.data.nome.size() >= 2
